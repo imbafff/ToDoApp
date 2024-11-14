@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,14 +22,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.todoapp.R
-import com.example.todoapp.models.Importance
+
 
 @Composable
 fun MultiToggleButton(
-    currentSelection: Importance,
-    onToggleChange: (Importance) -> Unit
+    currentSelection: String,
+    onToggleChange: (String) -> Unit
 ) {
-    val toggleStates = listOf(Importance.LOW, Importance.NORMAL, Importance.HIGH)
+    val toggleStates = listOf("low", "basic", "important")
     val containerColor = Color(0xFFE0E0E0)
     val iconSize = 24.dp
 
@@ -60,7 +60,7 @@ fun MultiToggleButton(
                         .padding(vertical = 6.dp, horizontal = 8.dp)
                 ) {
                     when (toggleState) {
-                        Importance.LOW -> {
+                        "low" -> {
                             Icon(
                                 painter = painterResource(id = R.drawable.img_4),
                                 contentDescription = "Low importance",
@@ -70,7 +70,7 @@ fun MultiToggleButton(
                                     .padding(4.dp)
                             )
                         }
-                        Importance.NORMAL -> {
+                        "basic" -> {
                             Text(
                                 "нет",
                                 color = textColor,
@@ -78,7 +78,7 @@ fun MultiToggleButton(
                                 modifier = Modifier.padding(4.dp)
                             )
                         }
-                        Importance.HIGH -> {
+                        "important" -> {
                             Text(
                                 "‼️",
                                 color = if (isSelected) Color.Red else Color.Black,
@@ -88,13 +88,13 @@ fun MultiToggleButton(
                     }
                 }
 
-                if (index != toggleStates.size - 1) {
-                    Divider(
-                        color = Color.DarkGray,
+                if (index != (toggleStates.size - 1)) {
+                    HorizontalDivider(
                         modifier = Modifier
                             .padding(1.dp)
                             .width(0.8.dp)
-                            .height(20.dp)
+                            .height(20.dp),
+                        color = Color.DarkGray
                     )
                 }
             }

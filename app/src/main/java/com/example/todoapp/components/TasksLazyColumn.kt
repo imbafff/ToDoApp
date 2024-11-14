@@ -13,23 +13,35 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.todoapp.models.TodoItem
-import com.example.todoapp.repository.TodoItemsRepository
+import com.example.todoapp.viewModel.MainViewModel
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 
 object CurTask {
     var curTask: TodoItem? = null
 }
 
+
 @Composable
 fun TasksLazyColumn(innerPadding: PaddingValues, navController: NavController) {
-    val tasks = TodoItemsRepository.getAllTodoItems()
+    val viewModel: MainViewModel = viewModel()
+    val tasks by viewModel.todoList.collectAsState()
+    val currentRevision by viewModel.currentRevision.collectAsState()
+
+    LaunchedEffect(currentRevision) {
+        viewModel.fetchData("Aerinon")
+    }
+
 
     LazyColumn(
         contentPadding = innerPadding,
@@ -45,7 +57,19 @@ fun TasksLazyColumn(innerPadding: PaddingValues, navController: NavController) {
             )
         }
         items(tasks) { task ->
-            SwipeBox(modifier = Modifier.animateContentSize(), onDelete = {}, onComplete = {}) {
+            SwipeBox(
+                modifier = Modifier.animateContentSize(),
+                onDelete = {
+                    // Удаляем задачу
+                    viewModel.deleteTodoData("Aerinon", task.id)
+                },
+                onComplete = {
+                    // Изменяем состояние выполнения задачи
+                    task.isCompleted = !task.isCompleted
+                    // Обновляем задачу
+                    viewModel.updateTodoData("Aerinon", task.id, task)
+                }
+            ) {
                 TaskUi(task, onTaskClick = {
                     navController.navigate("add_task")
                     CurTask.curTask = task
@@ -72,3 +96,5 @@ fun TasksLazyColumn(innerPadding: PaddingValues, navController: NavController) {
         }
     }
 }
+
+

@@ -22,15 +22,20 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.todoapp.R
 import com.example.todoapp.repository.TodoItemsRepository
+import com.example.todoapp.viewModel.MainViewModel
+import kotlinx.coroutines.flow.count
 
 @Composable
 fun CustomTitle(isCollapsed: Boolean) {
+    val viewModel: MainViewModel = viewModel()
     val textSize by animateFloatAsState(targetValue = if (isCollapsed) 24f else 38f, label = "")
     val paddingStart by animateDpAsState(targetValue = if (isCollapsed) 0.dp else 60.dp, label = "")
     val iconSize by animateDpAsState(targetValue = if (isCollapsed) 40.dp else 48.dp, label = "")
     var isVisible by remember { mutableStateOf(true) }
+
 
     if (isCollapsed) {
         Row(
