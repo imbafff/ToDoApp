@@ -1,4 +1,5 @@
-package com.example.todoapp.components
+package com.example.todoapp.ui.components
+
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -8,10 +9,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,18 +24,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.todoapp.R
-import com.example.todoapp.repository.TodoItemsRepository
-import com.example.todoapp.viewModel.MainViewModel
-import kotlinx.coroutines.flow.count
+import com.example.todoapp.ui.viewModel.MainViewModel
+
 
 @Composable
 fun CustomTitle(isCollapsed: Boolean) {
     val viewModel: MainViewModel = viewModel()
+    val tasks by viewModel.todoList.collectAsState()
+    val completedTasksCount = tasks.count { it.isCompleted }
+    val isVisible by viewModel.isVisible.collectAsState()
+
     val textSize by animateFloatAsState(targetValue = if (isCollapsed) 24f else 38f, label = "")
     val paddingStart by animateDpAsState(targetValue = if (isCollapsed) 0.dp else 60.dp, label = "")
     val iconSize by animateDpAsState(targetValue = if (isCollapsed) 40.dp else 48.dp, label = "")
-    var isVisible by remember { mutableStateOf(true) }
 
+    LaunchedEffect(true) {
+        viewModel.fetchData()
+    }
 
     if (isCollapsed) {
         Row(
@@ -53,7 +58,7 @@ fun CustomTitle(isCollapsed: Boolean) {
                 color = Black
             )
             IconButton(
-                onClick = { isVisible = !isVisible },
+                onClick = { viewModel.toggleVisibility() },
                 modifier = Modifier.size(iconSize)
             ) {
                 Image(
@@ -77,12 +82,12 @@ fun CustomTitle(isCollapsed: Boolean) {
             Row(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     modifier = Modifier.weight(1f),
-                    text = "Выполнено - ${TodoItemsRepository.getAllTodoItems().count { it.isCompleted }}",
+                    text = "Выполнено - $completedTasksCount",
                     fontSize = 20.sp,
                     color = LightGray
                 )
                 IconButton(
-                    onClick = { isVisible = !isVisible },
+                    onClick = { viewModel.toggleVisibility() },
                     modifier = Modifier.size(iconSize)
                 ) {
                     Image(

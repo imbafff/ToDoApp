@@ -1,4 +1,5 @@
-package com.example.todoapp.components
+package com.example.todoapp.ui.components
+
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
@@ -22,10 +23,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.todoapp.models.TodoItem
-import com.example.todoapp.viewModel.MainViewModel
-import androidx.compose.runtime.collectAsState
+import com.example.todoapp.domain.model.TodoItem
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.todoapp.ui.viewModel.MainViewModel
 
 object CurTask {
     var curTask: TodoItem? = null
@@ -35,17 +36,18 @@ object CurTask {
 @Composable
 fun TasksLazyColumn(innerPadding: PaddingValues, navController: NavController) {
     val viewModel: MainViewModel = viewModel()
-    val tasks by viewModel.todoList.collectAsState()
-    val currentRevision by viewModel.currentRevision.collectAsState()
+    val tasks by viewModel.todoList.collectAsStateWithLifecycle()
+    val isVisible by viewModel.isVisible.collectAsStateWithLifecycle()
+    LaunchedEffect(Unit) {
+        viewModel.fetchData()
 
-    LaunchedEffect(currentRevision) {
-        viewModel.fetchData("Aerinon")
     }
-
 
     LazyColumn(
         contentPadding = innerPadding,
-        modifier = Modifier.background(Color(0xFFF7F6F2)).padding(10.dp)
+        modifier = Modifier
+            .background(Color(0xFFF7F6F2))
+            .padding(10.dp)
     ) {
         item {
             Box(
@@ -56,18 +58,16 @@ fun TasksLazyColumn(innerPadding: PaddingValues, navController: NavController) {
                     .background(Color.White)
             )
         }
-        items(tasks) { task ->
+
+        items(tasks.filter { task -> isVisible || !task.isCompleted }) { task ->
             SwipeBox(
                 modifier = Modifier.animateContentSize(),
                 onDelete = {
-                    // Удаляем задачу
-                    viewModel.deleteTodoData("Aerinon", task.id)
+                    viewModel.deleteTodoData(task.id)
                 },
                 onComplete = {
-                    // Изменяем состояние выполнения задачи
-                    task.isCompleted = !task.isCompleted
-                    // Обновляем задачу
-                    viewModel.updateTodoData("Aerinon", task.id, task)
+                    val updatedTask = task.copy(isCompleted = !task.isCompleted)
+                    viewModel.updateTodoData(task.id, updatedTask)
                 }
             ) {
                 TaskUi(task, onTaskClick = {
@@ -76,6 +76,7 @@ fun TasksLazyColumn(innerPadding: PaddingValues, navController: NavController) {
                 })
             }
         }
+
         item {
             TextButton(
                 onClick = {
@@ -90,7 +91,9 @@ fun TasksLazyColumn(innerPadding: PaddingValues, navController: NavController) {
                 Text(
                     "Новое", color = Color.Gray, fontWeight = FontWeight.W400,
                     textAlign = TextAlign.Start,
-                    modifier = Modifier.fillMaxWidth().padding(start = 18.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 18.dp)
                 )
             }
         }
