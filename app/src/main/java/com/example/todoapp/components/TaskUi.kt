@@ -25,7 +25,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.todoapp.R
 import com.example.todoapp.models.TodoItem
-import com.example.todoapp.models.Importance
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @Composable
 fun TaskUi(task: TodoItem, onTaskClick: () -> Unit) {
@@ -37,19 +38,19 @@ fun TaskUi(task: TodoItem, onTaskClick: () -> Unit) {
     val inlineContent = mapOf(
         "icon" to InlineTextContent(
             placeholder = Placeholder(
-                width = if (task.importance == Importance.NORMAL) 0.sp else 24.sp,
-                height = if (task.importance == Importance.NORMAL) 0.sp else 24.sp,
+                width = if (task.importance == "basic") 0.sp else 24.sp,
+                height = if (task.importance == "basic") 0.sp else 24.sp,
                 placeholderVerticalAlign = PlaceholderVerticalAlign.Center
             )
         ) {
             when (task.importance) {
-                Importance.LOW -> Image(
+                "low" -> Image(
                     painter = painterResource(id = R.drawable.img_4),
                     contentDescription = null,
                     modifier = Modifier.size(24.dp)
                 )
-                Importance.NORMAL -> Text("")
-                Importance.HIGH -> Image(
+                "basic" -> Text("")
+                "important" -> Image(
                     painter = painterResource(id = R.drawable.img_8),
                     contentDescription = null,
                     modifier = Modifier.size(24.dp)
@@ -74,9 +75,8 @@ fun TaskUi(task: TodoItem, onTaskClick: () -> Unit) {
                 painter = painterResource(
                     if (task.isCompleted) R.drawable.img
                     else when (task.importance) {
-                        Importance.HIGH -> R.drawable.img_2
-                        Importance.LOW -> R.drawable.img_1
-                        Importance.NORMAL -> R.drawable.img_1
+                        "important" -> R.drawable.img_2
+                        else -> {R.drawable.img_1}
                     }
                 ),
                 contentDescription = "checkBox",
@@ -103,8 +103,11 @@ fun TaskUi(task: TodoItem, onTaskClick: () -> Unit) {
                     color = if (task.isCompleted) Color.LightGray else Color.Black
                 )
             }
+
             task.deadline?.let {
-                Text(text = it, color = Color.LightGray)
+                val dateFormat = SimpleDateFormat("dd MMMM yyyy", Locale("ru"))
+                val formattedDate = dateFormat.format(it)
+                Text(text = formattedDate, color = Color.LightGray)
             }
         }
 

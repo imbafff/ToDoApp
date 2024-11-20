@@ -8,11 +8,14 @@ import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,6 +30,11 @@ fun SwipeBox(
 ) {
     val swipeState = rememberSwipeToDismissBoxState()
 
+    // Переменные для проверки, чтобы действия не повторялись
+    var isDeleted by remember { mutableStateOf(false) }
+    var isCompleted by remember { mutableStateOf(false) }
+
+    // Регистрируем изменение состояния свайпа
     val showDeleteButton = swipeState.dismissDirection == SwipeToDismissBoxValue.EndToStart
     val showCompleteButton = swipeState.dismissDirection == SwipeToDismissBoxValue.StartToEnd
 
@@ -51,26 +59,28 @@ fun SwipeBox(
                 },
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                if (showCompleteButton) {
-                    IconButton(onClick = { onComplete() }) {
-                        Icon(
-                            imageVector = Icons.Outlined.Check,
-                            contentDescription = "Complete",
-                            tint = Color.White
-                        )
-                    }
+                if (showCompleteButton && !isCompleted) {
+                    // Обработка завершения задачи
+                    onComplete()
+                    isCompleted = true // Отметим, что задача завершена
+                    Icon(
+                        imageVector = Icons.Outlined.Check,
+                        contentDescription = "Complete",
+                        tint = Color.White
+                    )
                 }
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                if (showDeleteButton) {
-                    IconButton(onClick = { onDelete() }) {
-                        Icon(
-                            imageVector = Icons.Outlined.Delete,
-                            contentDescription = "Delete",
-                            tint = Color.White
-                        )
-                    }
+                if (showDeleteButton && !isDeleted) {
+                    // Обработка удаления задачи
+                    onDelete()
+                    isDeleted = true // Отметим, что задача удалена
+                    Icon(
+                        imageVector = Icons.Outlined.Delete,
+                        contentDescription = "Delete",
+                        tint = Color.White
+                    )
                 }
             }
         }
@@ -78,4 +88,3 @@ fun SwipeBox(
         content()
     }
 }
-

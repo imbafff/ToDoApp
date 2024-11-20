@@ -1,5 +1,6 @@
 package com.example.todoapp.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -45,23 +46,26 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.todoapp.components.CurTask
 import com.example.todoapp.components.MultiToggleButton
-import com.example.todoapp.models.Importance
 import com.example.todoapp.models.TodoItem
+import com.example.todoapp.viewModel.MainViewModel
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddTaskScreen(onAdd: (TodoItem) -> Unit, onBack: () -> Unit) {
+fun AddTaskScreen(onAdd: (Pair<TodoItem, Boolean>) -> Unit, onBack: () -> Unit) {
+    val viewModel: MainViewModel = viewModel()
     val task = CurTask.curTask
     var taskText by remember { mutableStateOf(task?.text ?: "") }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
-    var selectedOption: Importance by remember { mutableStateOf(task?.importance ?: Importance.LOW) }
-    var dateText by remember { mutableStateOf(task?.deadline) }
+    var selectedOption by remember { mutableStateOf(task?.importance ?: "basic") }
+    var dateLong by remember { mutableStateOf(task?.deadline) }
     var checked by remember {
         mutableStateOf(task?.deadline != null)
     }
@@ -74,8 +78,7 @@ fun AddTaskScreen(onAdd: (TodoItem) -> Unit, onBack: () -> Unit) {
             context,
             { _, year, month, dayOfMonth ->
                 calendar.set(year, month, dayOfMonth)
-                val dateFormat = SimpleDateFormat("d MMMM yyyy", Locale("ru"))
-                dateText = dateFormat.format(calendar.time)
+                dateLong = calendar.timeInMillis
             },
             calendar.get(Calendar.YEAR),
             calendar.get(Calendar.MONTH),
@@ -85,11 +88,11 @@ fun AddTaskScreen(onAdd: (TodoItem) -> Unit, onBack: () -> Unit) {
 
     LaunchedEffect(checked) {
         if (checked) {
-            if (dateText == null) {
+            if (dateLong == null) {
                 showDatePicker()
             }
         } else {
-            dateText = null
+            dateLong = null
         }
     }
 
@@ -107,7 +110,18 @@ fun AddTaskScreen(onAdd: (TodoItem) -> Unit, onBack: () -> Unit) {
                 },
                 actions = {
                     TextButton(onClick = {
-                        onBack() }) {
+                        onAdd(Pair(TodoItem(
+                            id = task?.id ?: UUID.randomUUID().toString(),
+                            text = taskText,
+                            importance = selectedOption,
+                            color = "red",
+                            changedAt = System.currentTimeMillis(),
+                            deadline = dateLong,
+                            isCompleted = task?.isCompleted ?: false,
+                            createdAt = task?.createdAt ?: System.currentTimeMillis(),
+                            lastUpdatedBy = task?.lastUpdatedBy ?: "device123",
+                        ), (task != null)
+                        )) }) {
                         Text("Сохранить", color = Color(0xFF2196F3))
                     }
                 },
@@ -115,9 +129,9 @@ fun AddTaskScreen(onAdd: (TodoItem) -> Unit, onBack: () -> Unit) {
                 modifier = Modifier.shadow(if (scrollBehavior.state.overlappedFraction > 0f) 8.dp else 0.dp),
                 colors = TopAppBarDefaults.smallTopAppBarColors(
                     containerColor = if (scrollBehavior.state.overlappedFraction > 0f) {
-                        Color(0xFFEFEFEF)
+                        Color(0xFFF7F6F2)
                     } else {
-                        Color.White
+                        Color(0xFFF7F6F2)
                     }
                 )
             )
@@ -125,7 +139,9 @@ fun AddTaskScreen(onAdd: (TodoItem) -> Unit, onBack: () -> Unit) {
     ) { innerPadding ->
         LazyColumn(
             contentPadding = innerPadding,
+
             modifier = Modifier
+                .background(Color(0xFFF7F6F2))
                 .fillMaxSize()
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
         ) {
@@ -170,7 +186,11 @@ fun AddTaskScreen(onAdd: (TodoItem) -> Unit, onBack: () -> Unit) {
                 ) {
                     Column {
                         Text("Сделать до", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                        Text(text = dateText ?: "", fontSize = 14.sp, color = Color.Blue)
+                        Text(
+                            text = (dateLong?.let { SimpleDateFormat("d MMMM yyyy", Locale("ru")).format(it) } ?: ""),
+                            fontSize = 14.sp,
+                            color = Color.Blue
+                        )
                     }
                     Switch(
                         checked = checked,
@@ -188,7 +208,12 @@ fun AddTaskScreen(onAdd: (TodoItem) -> Unit, onBack: () -> Unit) {
             item { HorizontalDivider() }
             item {
                 TextButton(
-                    onClick = { onBack },
+                    onClick = {
+                        if (task != null) {
+                            viewModel.deleteTodoData("Aerinon", task.id)
+                        }
+                        onBack()
+                              },
                     modifier = Modifier
                         .padding(top = 16.dp),
 
