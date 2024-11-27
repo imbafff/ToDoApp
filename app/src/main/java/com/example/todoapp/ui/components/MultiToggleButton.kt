@@ -1,4 +1,4 @@
-package com.example.todoapp.components
+package com.example.todoapp.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -80,7 +80,7 @@ fun MultiToggleButton(
                         }
                         "important" -> {
                             Text(
-                                "‼️",
+                                "‼\uFE0F",
                                 color = if (isSelected) Color.Red else Color.Black,
                                 modifier = Modifier.padding(4.dp)
                             )

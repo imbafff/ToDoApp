@@ -73,5 +73,9 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.material)
+    implementation(libs.revealswipe)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+
     ksp(libs.room.compiler)
 }
