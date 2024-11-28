@@ -1,4 +1,4 @@
-package com.example.todoapp.models
+package com.example.todoapp.domain.model
 
 import com.google.gson.annotations.SerializedName
 import androidx.room.Entity

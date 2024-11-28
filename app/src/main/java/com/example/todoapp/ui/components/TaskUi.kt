@@ -1,4 +1,4 @@
-package com.example.todoapp.components
+package com.example.todoapp.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -24,7 +24,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.todoapp.R
-import com.example.todoapp.models.TodoItem
+import com.example.todoapp.domain.model.TodoItem
 import java.text.SimpleDateFormat
 import java.util.Locale
 

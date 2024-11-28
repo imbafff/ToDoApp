@@ -11,11 +11,13 @@ composeBom = "2024.04.01"
 navigationCompose = "2.8.3"
 okhttp = "4.12.0"
 retrofit = "2.11.0"
+revealswipe = "1.0.0"
 roomCompiler = "2.6.1"
 roomRuntime = "2.6.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycleRuntimeKtx" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomRuntime" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -35,8 +37,10 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
+revealswipe = { module = "de.charlex.compose:revealswipe", version.ref = "revealswipe" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomCompiler" }
 x-x-x = { module = "org.jetbrains.compose.material:1.7.1" }
+androidx-material = { group = "androidx.compose.material", name = "material" }
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

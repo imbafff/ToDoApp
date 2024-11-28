@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("com.google.devtools.ksp")
+    id("org.jetbrains.kotlin.kapt")
 }
 
 android {
@@ -51,6 +52,7 @@ android {
 }
 
 dependencies {
+    ksp("org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.2.0")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -67,11 +69,16 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-
+    implementation ("com.google.dagger:dagger:2.43.2")
+    ksp("com.google.dagger:dagger-compiler:2.43.2")
     implementation(libs.retrofit)
     implementation(libs.okhttp)
     implementation(libs.converter.gson)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.material)
+    implementation(libs.revealswipe)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+
     ksp(libs.room.compiler)
 }

@@ -1,4 +1,5 @@
-package com.example.todoapp.screens
+package com.example.todoapp.ui.screens
+
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -15,7 +16,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -46,20 +46,18 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.todoapp.components.CurTask
-import com.example.todoapp.components.MultiToggleButton
-import com.example.todoapp.models.TodoItem
-import com.example.todoapp.viewModel.MainViewModel
+import com.example.todoapp.ui.components.CurTask
+import com.example.todoapp.ui.components.MultiToggleButton
+import com.example.todoapp.domain.model.TodoItem
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 import java.util.UUID
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddTaskScreen(onAdd: (Pair<TodoItem, Boolean>) -> Unit, onBack: () -> Unit) {
-    val viewModel: MainViewModel = viewModel()
+fun AddTaskScreen(onAdd: (Pair<TodoItem, Boolean>) -> Unit, onBack: () -> Unit, onDelete: (String) -> Unit) {
     val task = CurTask.curTask
     var taskText by remember { mutableStateOf(task?.text ?: "") }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -110,7 +108,8 @@ fun AddTaskScreen(onAdd: (Pair<TodoItem, Boolean>) -> Unit, onBack: () -> Unit) 
                 },
                 actions = {
                     TextButton(onClick = {
-                        onAdd(Pair(TodoItem(
+                        onAdd(Pair(
+                            TodoItem(
                             id = task?.id ?: UUID.randomUUID().toString(),
                             text = taskText,
                             importance = selectedOption,
@@ -176,7 +175,7 @@ fun AddTaskScreen(onAdd: (Pair<TodoItem, Boolean>) -> Unit, onBack: () -> Unit) 
                 }
             }
             item {
-                Divider(modifier = Modifier.padding(16.dp))
+                HorizontalDivider(modifier = Modifier.padding(16.dp))
             }
             item {
                 Row(
@@ -210,9 +209,8 @@ fun AddTaskScreen(onAdd: (Pair<TodoItem, Boolean>) -> Unit, onBack: () -> Unit) 
                 TextButton(
                     onClick = {
                         if (task != null) {
-                            viewModel.deleteTodoData("Aerinon", task.id)
+                            onDelete(task.id)
                         }
-                        onBack()
                               },
                     modifier = Modifier
                         .padding(top = 16.dp),
