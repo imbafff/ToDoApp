@@ -24,12 +24,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.todoapp.R
+import com.example.todoapp.data.repository.TodoItemsRepository
 import com.example.todoapp.ui.viewModel.MainViewModel
+import com.example.todoapp.ui.viewModel.MainViewModelFactory
+import com.example.todoapp.utils.ErrorHandler
 
 
 @Composable
 fun CustomTitle(isCollapsed: Boolean) {
-    val viewModel: MainViewModel = viewModel()
+    val viewModel: MainViewModel = viewModel(
+        factory = MainViewModelFactory(TodoItemsRepository(), ErrorHandler())
+    )
     val tasks by viewModel.todoList.collectAsState()
     val completedTasksCount = tasks.count { it.isCompleted }
     val isVisible by viewModel.isVisible.collectAsState()

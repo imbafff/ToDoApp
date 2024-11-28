@@ -10,13 +10,19 @@ import androidx.compose.runtime.collectAsState
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.todoapp.data.repository.TodoItemsRepository
 import com.example.todoapp.ui.screens.AddTaskScreen
 import com.example.todoapp.ui.screens.MainScreen
 import com.example.todoapp.ui.viewModel.MainViewModel
+import com.example.todoapp.ui.viewModel.MainViewModelFactory
+import com.example.todoapp.utils.ErrorHandler
+
 
 
 class MainActivity : ComponentActivity() {
-    private val mainViewModel: MainViewModel by viewModels()
+    private val mainViewModel: MainViewModel by viewModels {
+        MainViewModelFactory(TodoItemsRepository(), ErrorHandler())
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         mainViewModel.fetchData()

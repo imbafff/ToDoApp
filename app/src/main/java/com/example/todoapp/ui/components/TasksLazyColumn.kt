@@ -26,7 +26,10 @@ import androidx.navigation.NavController
 import com.example.todoapp.domain.model.TodoItem
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.todoapp.data.repository.TodoItemsRepository
 import com.example.todoapp.ui.viewModel.MainViewModel
+import com.example.todoapp.ui.viewModel.MainViewModelFactory
+import com.example.todoapp.utils.ErrorHandler
 
 object CurTask {
     var curTask: TodoItem? = null
@@ -35,7 +38,9 @@ object CurTask {
 
 @Composable
 fun TasksLazyColumn(innerPadding: PaddingValues, navController: NavController) {
-    val viewModel: MainViewModel = viewModel()
+    val viewModel: MainViewModel = viewModel(
+        factory = MainViewModelFactory(TodoItemsRepository(), ErrorHandler())
+    )
     val tasks by viewModel.todoList.collectAsStateWithLifecycle()
     val isVisible by viewModel.isVisible.collectAsStateWithLifecycle()
     LaunchedEffect(Unit) {

@@ -2,19 +2,50 @@ package com.example.todoapp.ui.viewModel
 
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.todoapp.data.repository.TodoItemsRepository
+import com.example.todoapp.di.AppComponent
 import com.example.todoapp.domain.model.TodoItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import com.example.todoapp.utils.ErrorHandler
+import dagger.Component
+import dagger.Module
+import dagger.Provides
+import javax.inject.Inject
+import javax.inject.Scope
 
 
-private val apiRepository = TodoItemsRepository()
-private val errorHandler = ErrorHandler()
-class MainViewModel : ViewModel() {
+@Scope
+@Retention(AnnotationRetention.RUNTIME)
+annotation class ViewModelScope
+
+@Module
+class ViewModelModule {
+    @Provides
+    @ViewModelScope
+    fun provideMainViewModel(
+        todoItemsRepository: TodoItemsRepository,
+        errorHandler: ErrorHandler
+    ): MainViewModel {
+        return MainViewModel(todoItemsRepository, errorHandler)
+    }
+}
+
+@Component(modules = [ViewModelModule::class], dependencies = [AppComponent::class])
+@ViewModelScope
+interface ViewModelComponent {
+    fun inject(viewModel: MainViewModel)
+}
+
+
+class MainViewModel @Inject constructor(
+    val apiRepository: TodoItemsRepository,
+    val errorHandler: ErrorHandler
+) : ViewModel() {
     private var _isVisible = MutableStateFlow(true)
     val isVisible: MutableStateFlow<Boolean> get() = _isVisible
     private val _todoList = MutableStateFlow<List<TodoItem>>(emptyList())
@@ -102,3 +133,17 @@ class MainViewModel : ViewModel() {
     }
 }
 
+
+class MainViewModelFactory(
+    private val apiRepository: TodoItemsRepository,
+    private val errorHandler: ErrorHandler
+) : ViewModelProvider.Factory {
+
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        // Проверяем, что модель именно MainViewModel
+        if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
+            return MainViewModel(apiRepository, errorHandler) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}
